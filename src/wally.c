@@ -1,12 +1,10 @@
 /**
  * Wally simple privacy tool
  *
- * Written by Carlos Carvalho <carloslack@gmail.com>
+ * Written by hash <carloslack@gmail.com>
  * Sat Sep  6 22:29:12 BRT 2014
  *
  * Where is Wally?!
- *
- * This is NOT a rootkit
  *
  * This simple code hides user tasks
  * from userland tools by unlinking
@@ -26,23 +24,6 @@
  *
  * User commands like kill, ps, lsof and so on would not
  * find such tasks.
- *
- * But what goes must be able to return and it is achieved by
- * re-inserting previously hidden tasks into their original
- * places inside the kernel.
- *
- * The general idea for this code is to improve privacy for
- * system administrators and/or home users that for same reason
- * decides to share their boxes with friends or co-workers but
- * decide not to let other people know what programs they run
- * or which activiries are being performed on the system.
- *
- * Another possibility would be its use in honeypots or
- * similar systems, altough I dislike this white hat approach.
- *
- * head to README for usage.
- *
- * Warning: This code may have bugs - not much tested yet.
  *
  */
 #include <linux/export.h>
