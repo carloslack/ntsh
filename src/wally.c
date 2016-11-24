@@ -56,6 +56,10 @@ static struct proc_dir_entry *WallyProcFileEntry;
 struct __lkm_access_t{ struct module *this_mod; };
 static char *magic_word;
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)
+#error "Unsupported kernel version"
+#endif
+
 #define WALLY_DECLARE_MOD(x)                                            \
     MODULE_LICENSE("GPL");                                              \
     MODULE_AUTHOR("Carlos Carvalho <carloslack@gmail.com>");            \
