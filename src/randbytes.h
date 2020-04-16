@@ -13,7 +13,7 @@ wally_random_bytes(size_t size)
 {
    static int i = 0;
    char *buf = NULL;
-   if(size <= 0)
+   if(!size)
      {
         printk(KERN_ERR "Wrong size parameter!!\n");
         return NULL;

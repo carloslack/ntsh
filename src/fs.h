@@ -3,7 +3,7 @@
 
 struct fs_file_node
 {
-   u64 ino;
+   unsigned long long ino;
    const char *filename;
 };
 
