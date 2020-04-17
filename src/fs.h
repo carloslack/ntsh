@@ -3,8 +3,8 @@
 
 struct fs_file_node
 {
-   unsigned long long ino;
-   const char *filename;
+    unsigned long long ino;
+    const char *filename;
 };
 
 /**
