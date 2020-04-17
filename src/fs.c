@@ -8,10 +8,7 @@
 #include <linux/version.h>
 #include "fs.h"
 
-
-struct fs_file_node*
-fs_get_file_node(const struct task_struct *task)
-{
+struct fs_file_node* fs_get_file_node(const struct task_struct *task) {
     struct fs_file_node *fnode;
     struct inode *i;
     struct kstat stat;
