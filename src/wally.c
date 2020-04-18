@@ -4,24 +4,6 @@
  * Written by hash <carloslack@gmail.com>
  * Sat Sep  6 22:29:12 BRT 2014
  *
- * This simple code hides user tasks
- * from userland tools by unlinking
- * internal kernel data structures making processes
- * not visible from userland tools. It is
- * important to say that it is not achieved by
- * simply hooking system calls like sys_write()
- * and alike, this is actually
- * achieved by un-hashing tasks references from internal
- * kernel lists, the ones that in the end would be displayed
- * to the system by means of /proc interface subsystem.
- *
- * Tasks hidden this way stop making part of /proc
- * subsystem then it is not possible for userland
- * tools to list.
- *
- * User commands like kill, ps, lsof and so on would not
- * find such tasks.
- *
  * Kernel version < 4.0.0
  *
  */
