@@ -9,6 +9,10 @@
 #include "fs.h"
 
 struct fs_file_node* fs_get_file_node(const struct task_struct *task) {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,11,0)
+    u32 req_mask = STATX_INO;
+    unsigned int query_mask = AT_STATX_SYNC_AS_STAT;
+#endif
     struct fs_file_node *fnode;
     struct inode *i;
     struct kstat stat;
@@ -47,10 +51,12 @@ struct fs_file_node* fs_get_file_node(const struct task_struct *task) {
 
     memset(&stat, 0, sizeof(struct kstat));
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3,19,0)
-    op->getattr(task_active_pid_ns(current)->proc_mnt, f->f_dentry, &stat);
-#else
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,11,0)
+    op->getattr(&f->f_path, &stat, req_mask, query_mask);
+#elif LINUX_VERSION_CODE < KERNEL_VERSION(4,11,0)
     op->getattr(task_active_pid_ns(current)->proc_mnt, f->f_path.dentry, &stat);
+#elif LINUX_VERSION_CODE < KERNEL_VERSION(3,19,0)
+    op->getattr(task_active_pid_ns(current)->proc_mnt, f->f_dentry, &stat);
 #endif
 
     fnode = kcalloc(1, sizeof(struct fs_file_node), GFP_KERNEL);

