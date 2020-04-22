@@ -34,34 +34,36 @@ extern void wally_list_saved_tasks(void);
 extern void wally_data_cleanup(void);
 
 static struct proc_dir_entry *WallyProcFileEntry;
-struct __lkm_access_t{ struct module *this_mod; };
+struct __lkmmod_t{ struct module *this_mod; };
 static char *magic_word;
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0)
 #pragma message "!! Warning: Unsupported kernel version !!"
 #endif
 
-#define WALLY_DECLARE_MOD(x)                                            \
-    MODULE_LICENSE("GPL");                                              \
-    MODULE_AUTHOR("Carlos Carvalho <carloslack@gmail.com>");            \
-    MODULE_DESCRIPTION("Wally - privacy module for paranoid people");   \
-    static struct list_head *mod_list;                                  \
-    static const struct __lkm_access_t lkm_access_##x = {               \
-        .this_mod = THIS_MODULE,                                        \
-    };                                                                  \
-    void wally_hide_mod(void) {                                         \
-          if(!mod_list) {                                               \
-               mod_list = lkm_access_##x.this_mod->list.prev;           \
-               list_del(&(lkm_access_##x.this_mod->list));              \
-            }                                                           \
-    }                                                                   \
-    void wally_unhide_mod(void) {                                       \
-          if(mod_list) {                                                \
-               list_add(&(lkm_access_##x.this_mod->list), mod_list);    \
-               mod_list = NULL;                                         \
-            }                                                           \
+#define WALLY_DECLARE_MOD()                                           \
+    MODULE_LICENSE("GPL");                                            \
+    MODULE_AUTHOR("Carlos Carvalho <carloslack@gmail.com>");          \
+    MODULE_DESCRIPTION("Wally - privacy module for paranoid people");
+
+static struct list_head *mod_list;
+static const struct __lkmmod_t lkmmod = {
+    .this_mod = THIS_MODULE,
+};
+
+static void wally_hide_mod(void) {
+    if(!mod_list) {
+        mod_list = lkmmod.this_mod->list.prev;
+        list_del(&(lkmmod.this_mod->list));
     }
-WALLY_DECLARE_MOD(wally);
+}
+static void wally_unhide_mod(void) {
+    if(mod_list) {
+        list_add(&(lkmmod.this_mod->list), mod_list);
+        mod_list = NULL;
+    }
+}
+WALLY_DECLARE_MOD();
 
 static char* get_unhide_magic_word(void) {
     if(!magic_word)
