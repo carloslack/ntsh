@@ -4,8 +4,8 @@ ARCH=arch/x86
 
 MOD_PROC_FILE=
 
-# WALLY_PROC_FILE, /proc/<name>, change this if you wish
-COMPILER_OPTIONS := -Werror -Wall -DWALLY_PROC_FILE='"wally"'
+# PROCNAME, /proc/<name>, change this if you wish
+COMPILER_OPTIONS := -Werror -Wall -DPROCNAME='"wally"' -DMODNAME='"wally"'
 EXTRA_CFLAGS := -I$(src)/src -I$(src)/fs ${COMPILER_OPTIONS}
 
 SRC := src/${OBJNAME}.c src/kernel_addr.c src/pid.c src/fs.c
@@ -22,11 +22,7 @@ all:
 
 clean:
 	@make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
-	@rm -f .hide* *.o src/*.o
-	@find . -name "*.swp" |xargs rm -fv 2>/dev/null
-	@find . -name "*.swo" |xargs rm -fv 2>/dev/null
-	@find . -name "*.swx" |xargs rm -fv 2>/dev/null
-	@find . -name "*~" |xargs rm -fv 2>/dev/null
+	@rm -f *.o src/*.o
 	@rm -f ./tests/test
 	@echo "Clean."
 
