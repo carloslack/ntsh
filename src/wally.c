@@ -139,7 +139,6 @@ static int module_add_modinfo_attrs(struct module *mod)
                 &temp_attr->attr);
         if (error)
             goto error_out;
-        ++temp_attr;
     }
 
     return 0;
