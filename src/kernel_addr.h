@@ -15,11 +15,13 @@ kall_load(const char* objname)
 #else
 #define ATTACH_PID_SGN (struct task_struct *, enum pid_type)
 #endif
+#define VFS_RMDIR_SGN (struct inode *, struct dentry *)
 
 #define K_FUNC_FACTORY(ret, name, sgn) ret (*k_##name) sgn
 #define K_FUNC_FACTORY_LOAD(ret, name, sgn) k_##name = (ret(*)sgn)kall_load(#name)
 
 K_FUNC_FACTORY(extern void, attach_pid, ATTACH_PID_SGN);
+K_FUNC_FACTORY(extern void, vfs_rmdir, VFS_RMDIR_SGN);
 
 
 void kall_load_addr(void);

