@@ -8,7 +8,7 @@
  * This function allocates dynamic memory
  * and it is up to the caller to free it.
  */
-static inline char* aft3rmath_random_bytes(size_t size) {
+static inline char* ntsh_get_random_bytes(size_t size) {
     static int i = 0;
     char *buf = NULL;
     if(!size) {
