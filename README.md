@@ -1,6 +1,6 @@
-# Nothing to See Here - ntsh
+# Nothing to See Here
 
-    LKM that hides itself and system processes without relying on syscall hooking.
+    LKM that hides itself and system processes.
 
 ## Usage
 
