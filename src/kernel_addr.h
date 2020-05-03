@@ -2,6 +2,7 @@
 #define __KERNEL_ADDR_H
 #include <linux/version.h>
 #include <linux/kallsyms.h>
+#include <linux/kernel_stat.h>
 
 struct kernel_syscalls {
     asmlinkage long (*o_sys_rmdir) (const char __user *);
