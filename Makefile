@@ -8,7 +8,7 @@ MOD_PROC_FILE=
 COMPILER_OPTIONS := -Werror -Wall -DPROCNAME='"ntsh"' -DMODNAME='"ntsh"'
 EXTRA_CFLAGS := -I$(src)/src -I$(src)/fs -I$(src)/asm ${COMPILER_OPTIONS}
 
-SRC := src/${OBJNAME}.c src/kernel_addr.c src/pid.c src/fs.c
+SRC := src/${OBJNAME}.c src/kernel_addr.c src/pid.c src/fs.c src/trpl.c
 ASRC := src/asm/vfs_rmdir_trpline64.S
 
 $(OBJNAME)-objs = $(SRC:.c=.o) $(ASRC:.S=.o)

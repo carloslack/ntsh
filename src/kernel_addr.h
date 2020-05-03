@@ -1,13 +1,18 @@
 #ifndef __KERNEL_ADDR_H
 #define __KERNEL_ADDR_H
 #include <linux/version.h>
-#include <linux/kernel_stat.h>
 #include <linux/kallsyms.h>
+
+struct kernel_syscalls {
+    asmlinkage long (*o_sys_rmdir) (const char __user *);
+    asmlinkage long (*o_sys_kill) (pid_t, int);
+    asmlinkage long (*o_sys_close) (unsigned int);
+};
 
 static inline unsigned long
 kall_load(const char* objname)
 {
-    return (unsigned long)kallsyms_lookup_name(objname);
+    return kallsyms_lookup_name(objname);
 }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0)
@@ -23,6 +28,7 @@ kall_load(const char* objname)
 K_FUNC_FACTORY(extern void, attach_pid, ATTACH_PID_SGN);
 K_FUNC_FACTORY(extern void, vfs_rmdir, VFS_RMDIR_SGN);
 
-
 void kall_load_addr(void);
+struct kernel_syscalls *kall_syscall_table_load(void);
+
 #endif
