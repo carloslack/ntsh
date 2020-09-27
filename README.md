@@ -2,6 +2,10 @@
 
     LKM that hides itself and system processes.
 
+<p align="left">
+    <a href="https://github.com/carloslack/ntsh/blob/master/LICENSE"><img alt="Software License" src="https://img.shields.io/badge/MIT-license-green.svg?style=flat-square"></a>
+</p>
+
 ## Usage
 
     Commands are sent to /proc/ntsh as ROOT, exemple:
