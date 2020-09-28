@@ -1,11 +1,9 @@
 extraction:
   cpp:
     prepare:
-      environment:
-        - KHEADERS: "${KERNEL_HEADERS}"
       packages:
         - build-essential
-        - linux-headers-"${KHEADERS}"
+        - linux-headers-generic
     after_prepare:
       - export GNU_MAKE=make
     index:
