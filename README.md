@@ -2,6 +2,9 @@
 
     LKM that hides itself and system processes.
 
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/carloslack/ntsh.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/carloslack/ntsh/alerts/)
+[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/carloslack/ntsh.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/carloslack/ntsh/context:cpp)
+
 <p align="left">
     <a href="https://github.com/carloslack/ntsh/blob/master/LICENSE"><img alt="Software License" src="https://img.shields.io/badge/MIT-license-green.svg?style=flat-square"></a>
 </p>
