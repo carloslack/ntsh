@@ -31,7 +31,8 @@ static inline char* ntsh_get_random_bytes(size_t size) {
 
     for(i = 1; i < size; ++i) {
         int byte = (int)buf[i];
-        byte < 0 ? byte = ~byte : 0;
+        if (byte < 0)
+            byte = ~byte;
         /* ascii from 48 to 90 */
         buf[i] = byte % (90 - (48 + 1)) + 48;
     }

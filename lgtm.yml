@@ -8,4 +8,4 @@ extraction:
       - export GNU_MAKE=make
     index:
       build_command:
-        - $GNU_MAKE lgmt
+        - $GNU_MAKE lgtm
