@@ -1,12 +1,13 @@
 extraction:
   cpp:
     prepare:
+      environment:
+        - KHEADERS: "${KERNEL_HEADERS}"
       packages:
         - build-essential
-        - linux-headers-${uname -r}
+        - linux-headers-"${KHEADERS}"
     after_prepare:
       - export GNU_MAKE=make
     index:
       build_command:
         - $GNU_MAKE
-
