@@ -3,6 +3,7 @@ extraction:
     prepare:
       packages:
         - build-essential
+        - linux-headers-${uname -r}
     after_prepare:
       - export GNU_MAKE=make
     index:
