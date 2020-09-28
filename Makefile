@@ -18,9 +18,6 @@ obj-m := ${OBJNAME}.o
 CC=gcc
 
 all:
-	# help yaml
-	echo "KERNEL_HEADERS=linux-headers-`uname -r`" >.env
-
 	make  -C  /lib/modules/$(shell uname -r)/build M=$(PWD) modules
 	$(CC) ./tests/test.c -o ./tests/test
 
@@ -28,7 +25,6 @@ clean:
 	@make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
 	@rm -f *.o src/*.o
 	@rm -f ./tests/test
-	@rm -f .env
 	@echo "Clean."
 
 tags:
