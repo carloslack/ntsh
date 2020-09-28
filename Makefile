@@ -21,6 +21,8 @@ all:
 	make  -C  /lib/modules/$(shell uname -r)/build M=$(PWD) modules
 	$(CC) ./tests/test.c -o ./tests/test
 
+# This make option is very hacky until I find a better
+# way to integrate with LGTM & yaml
 lgtm:
 	make  -C  /lib/modules/$(shell dpkg --status linux-headers-generic |grep Depends| \
 		cut -d ":" -f2| sed 's/ linux-headers-//g')/build M=$(PWD) modules
