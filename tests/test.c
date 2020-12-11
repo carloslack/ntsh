@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
     char p[32+1] = {0};
     FILE *fp;
 
-    snprintf(p, 32, "/tmp/wally.%d", pid);
+    snprintf(p, 32, "/tmp/ntsh.%d", pid);
     fp = fopen(p, "w");
     if (fp) {
         struct timeval tv;
