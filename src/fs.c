@@ -46,7 +46,7 @@ struct fs_file_node* fs_get_file_node(const struct task_struct *task) {
         return NULL;
 
     op = i->i_op;
-    if(!op)
+    if(!op || !op->getattr)
         return NULL;
 
     memset(&stat, 0, sizeof(struct kstat));
