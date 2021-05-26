@@ -3,6 +3,9 @@
 #include <linux/version.h>
 #include <linux/kallsyms.h>
 #include <linux/kernel_stat.h>
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 7, 0)
+#include <linux/kprobes.h>
+#endif
 
 struct kernel_syscalls {
     asmlinkage long (*o_sys_rmdir) (const char __user *);
@@ -10,10 +13,13 @@ struct kernel_syscalls {
     asmlinkage long (*o_sys_close) (unsigned int);
 };
 
+typedef unsigned long (*kallsyms_lookup_name_t)(const char *);
+static kallsyms_lookup_name_t kallsyms_lookup_name_ptr;
+
 static inline unsigned long
 kall_load(const char* objname)
 {
-    return kallsyms_lookup_name(objname);
+    return kallsyms_lookup_name_ptr(objname);
 }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3,11,0)

@@ -373,6 +373,7 @@ efault_error:
 /**
  * proc file callbacks and defs
  */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,6,0)
 static const struct file_operations proc_file_fops = {
     .owner =   THIS_MODULE,
     .open  =   open_cb,
@@ -380,6 +381,14 @@ static const struct file_operations proc_file_fops = {
     .release = seq_release,
     .write =   write_cb,
 };
+#else
+static const struct proc_ops proc_file_fops = {
+    .proc_open  =   open_cb,
+    .proc_read  =   seq_read,
+    .proc_release = seq_release,
+    .proc_write =   write_cb,
+};
+#endif
 
 static void do_remove_proc(void) {
     if(ntshProcFileEntry) {
