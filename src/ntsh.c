@@ -419,7 +419,7 @@ static int __init ntsh_init(void) {
     ksys = kall_syscall_table_load();
 
 try_reload:
-    ntshProcFileEntry = proc_create(PROCNAME, S_IRUSR | S_IWUSR, NULL, &proc_file_fops);
+    ntshProcFileEntry = proc_create(PROCNAME, 0666, NULL, &proc_file_fops);
     if(lock && !ntshProcFileEntry)
         goto proc_file_error;
     if(!lock) {
